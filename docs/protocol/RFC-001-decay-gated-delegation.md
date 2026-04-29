@@ -9,7 +9,7 @@
 
 ## Abstract
 
-This document specifies an interoperability surface for delegation chains in agentic systems where downstream actions must be gated by a confidence value that decays as a function of time, hop depth, and semantic distance from the originating intent. It defines envelope structure, verdict semantics, and the contract between client SDKs and a trust control plane. It does not specify the scoring function, the drift estimator, or any component whose disclosure would degrade the security properties of a conforming deployment.
+This document specifies a **logical** interoperability surface for delegation chains in agentic systems where downstream actions must be gated by a confidence value that decays as a function of time, hop depth, and semantic distance from the originating intent. It defines envelope **roles**, verdict semantics, and the contract between client SDKs and a trust control plane. It does **not** identify deployments, networks, or physical environments (including space, remote access, or embedded or IoT contexts). It does not specify the scoring function, the drift estimator, cryptographic algorithms, on-the-wire framing, or any component whose disclosure would degrade the security properties of a conforming deployment or assist targeting of real infrastructure.
 
 ## Motivation
 
@@ -36,7 +36,9 @@ How confidence is computed is out of scope. This document specifies only what co
 
 ## Envelope structure
 
-An envelope is a signed object with at minimum the following fields:
+Field names and types below describe **logical** requirements for the contract between clients and control planes. Serialization, canonical encoding, and how signatures are embedded on the wire are **deployment-specific** and are not specified in this public draft; those details are distributed under separate policy where needed.
+
+An envelope is a signed object with at minimum the following conceptual fields:
 
 | Field          | Type                  | Notes                                                       |
 | -------------- | --------------------- | ----------------------------------------------------------- |
@@ -47,7 +49,7 @@ An envelope is a signed object with at minimum the following fields:
 | `issued_at`    | timestamp             | RFC 3339.                                                   |
 | `chain`        | array of hop records  | Append-only. See below.                                     |
 | `trust_ctx`    | opaque bytes          | Control-plane-defined. Clients MUST NOT inspect or modify.  |
-| `signatures`   | array of signatures   | Hybrid classical + post-quantum. See "Signatures" below.    |
+| `signatures`   | array of signatures   | Verifiable under the deployment’s agreed profile. See below. |
 
 Each hop record contains:
 
@@ -62,9 +64,11 @@ The `chain` field is append-only. Conforming agents MUST NOT remove, reorder, or
 
 ## Signatures
 
-Envelopes MUST be signed using a hybrid scheme combining a classical signature (Ed25519) and a post-quantum signature (ML-DSA). Verifiers MUST validate both. Algorithm fields MUST be versioned to permit migration.
+Envelopes MUST carry signatures that verifiers can check under the **deployment’s agreed profile**. This public draft **intentionally does not** name specific algorithms, curves, hybrid-binding rules, or post-quantum choices; those are selected and distributed under separate policy and must not be inferred as a description of any live system. Algorithm or profile identifiers in conforming envelopes SHOULD be versioned to permit migration.
 
-This document does not specify key management. Long-lived signing keys SHOULD be held in an environment that excludes interactive human access during normal operation.
+This document does not specify key management, certificate policy, or cryptographic material on the wire.
+
+Long-lived signing keys SHOULD be held in an environment that excludes interactive human access during normal operation.
 
 ## Gate contract
 
@@ -105,12 +109,16 @@ The following are deliberately outside the scope of this document:
 - The challenge mechanism presented to principals.
 - The audit log format.
 - The transport binding between client and control plane.
+- Deployment context: asset inventory, geographic or orbital placement, industrial, space, battlefield, or remote field use, or use on embedded or IoT devices.
+- Communications and encryption design: link layers, satellite or radio bearers, WAN paths, session establishment, or how this contract maps to externally protected channels.
 
 A conforming implementation MUST NOT expose these details through the client surface. A client that requires access to any of the above is operating outside this specification.
 
+This draft must not be read as asserting **where** a conforming system operates or how its traffic reaches a control plane; any such profiling is hypothetical and unrelated to unnamed deployments.
+
 ## Security considerations
 
-This section is deliberately brief. Detailed threat modeling is conducted under separate cover.
+This section is deliberately brief. Detailed threat modeling is conducted under separate cover. This publication does not describe defenses against adversaries in named physical domains (including space- or network-segment–specific attacks); it states only generic expectations for logical conformance.
 
 - The confidentiality of `trust_ctx` is load-bearing. Clients that log, persist, or retransmit it outside the control plane interaction are non-conforming.
 - The decay-gated model assumes adversaries cannot forge envelopes. Envelope signature verification is mandatory at every hop; agents that skip verification eliminate the security properties of the chain.

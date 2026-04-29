@@ -2,7 +2,7 @@
 
 Client SDK for integrating with an Orbital Trust Fabric control plane. Provides typed primitives for issuing signed envelopes, propagating delegation context across hops, and gating actions by criticality tier.
 
-> **Preview release.** Interface surface is stable enough to prototype against. The reference control plane is not publicly available. This SDK ships with a local mock for development only.
+> **Preview release.** Interface surface is stable enough to prototype against. The reference control plane is not publicly available. This SDK ships with a local mock for development only. This document does not describe deployment environments, transport, or how clients reach a control plane across any particular network (including wide-area, embedded, or space-linked paths).
 
 ## Install
 
@@ -37,13 +37,13 @@ const orbital = new Orbital({ mode: "mock" }); // local mock; no network
 
 // Hop 0 — origin
 const envelope = await orbital.issue({
-  intent: "retrain-model:fraud-v3",
+  intent: "example:intent-alpha",
   criticality: Tier.MUTATE,
 });
 
-// Hop N — downstream agent prepares a destructive action
+// Hop N — downstream agent prepares a higher-tier action
 const verdict = await orbital.gate(envelope, {
-  action: "export-weights",
+  action: "example-action-beta",
   criticality: Tier.DESTRUCTIVE,
 });
 

@@ -2,7 +2,7 @@
 
 Interactive simulation environment for exploring false-interrupt rates under decay-gated delegation. Part of the Orbital Trust Fabric research preview.
 
-> **This is a simulation.** No production telemetry, detection logic, or calibrated parameters are exposed in this repository. All traces, decay coefficients, and outcome distributions are illustrative.
+> **This is a simulation.** No production telemetry, detection logic, or calibrated parameters are exposed in this repository. All traces, decay coefficients, and outcome distributions are illustrative. Nothing here implies use in operational space systems, remote field hardware, or live IoT or wide-area deployments; the preview is for desktop study only.
 
 ## What this shows
 
@@ -20,6 +20,7 @@ The demo lets you move three parameters (λ, α, β) and three thresholds (T1/T2
 - The drift estimator, behavioral signal pipeline, or any component of the trust scoring system.
 - Real adversarial traces, real operator telemetry, or real workload distributions.
 - Calibrated parameter values, gate thresholds, or operating points used in any deployment.
+- Any mapping to orbital, aerospace, industrial control, or remote or embedded device contexts.
 
 The numbers are designed to move in plausible directions when you adjust controls. They are not predictive of any real system's performance.
 
